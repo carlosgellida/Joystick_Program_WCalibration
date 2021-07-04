@@ -1,0 +1,10 @@
+Para utilizar este programa debe correrse el servidor, para esto se entra en 
+la carpeta NodeJS_code, y en la consola se escribe lo siguiente:
+
+node Server2.js
+
+Para visualizar los datos se ingresa en la carpeta HTML_code y el archivo 
+threejs_V1.0.html debe ser abierto en el navegador (solo se ha probado 
+con Chrome). Finalmente se debe establecer la comunicación serial con el 
+NodeMCU 32, en donde debe estar corriendo el programa main.cpp previamente
+compilado y cargado. 

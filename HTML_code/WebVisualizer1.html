@@ -1,0 +1,121 @@
+<html> 
+    <!-- Hello Cube -->
+
+    <style>
+        canvas {
+          width: 100%;
+          height: 100%;
+        }
+    </style>
+
+<canvas id="d"></canvas>
+
+<script type="module">
+    import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r127/build/three.module.js';
+
+    //import * as THREE from './resources/threejs/r127/build/three.module.js';
+function main() {
+  const canvas = document.querySelector('#d'); // Debe coincidir con canvas id
+
+  const renderer = new THREE.WebGLRenderer({canvas});
+
+  const fov = 80;
+  const aspect = 2;  // the canvas default
+  const near = 1;
+  const far = 20;
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  //camera.position.z = 10;
+  camera.position.x = 10 ; 
+  camera.rotation.y = 3.14149/2 ; 
+  camera.rotation.x = 3.14149/2 ; 
+
+  const scene = new THREE.Scene();
+
+  const radius = 4;
+  const height = 4; 
+  const radialSegment = 4 ; 
+  const geometry = new THREE.ConeGeometry(radius, height, radialSegment);
+
+  renderer.setSize(window.innerWidth, window.innerHeight); //Increase the quality
+
+  const material = new THREE.MeshPhongMaterial({
+  color: 0xFF0000,    // red (can also use a CSS color string here)
+  flatShading: true,
+  });
+
+   var pLight = new THREE.PointLight(0xffffff,0.8);
+  //pLight.castShadow = true;
+  pLight.position.set(2,5,2);
+  scene.add(pLight);
+
+  var pLight02 = new THREE.PointLight(0xefeeeee,0.8);
+  //pLight02.castShadow = true;
+  pLight02.position.set(-2,5,2);
+  scene.add(pLight02);
+
+  var pLight03 = new THREE.PointLight(0xffffff,0.8);
+  //pLight03.castShadow = true;
+  pLight03.position.set(0,3,-3);
+  scene.add(pLight03);   
+
+  const color = 0xFFFFFF;
+  const intensity = 0.5;
+  const light = new THREE.AmbientLight(color, intensity);
+  scene.add(light);
+
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+
+    function WebSocketBegin() {
+          const ws = new WebSocket('ws://192.168.0.5:8080/');
+          console.log("Hello!")
+
+          ws.onopen = function() {
+            // Web Socket is connected
+          };
+
+          ws.onerror = function (error) {
+            console.log('WebSocket Error ' + error);
+          };
+
+          ws.onmessage = function(evt) {
+            //create a JSON object
+            var pi = 3.14159 ; 
+            var jsonObject = JSON.parse(evt.data);
+
+            //console.log(jsonObject.QW, jsonObject.QX, jsonObject.QY, jsonObject.QZ) ; 
+            //console.log(jsonObject.EulerX, jsonObject.EulerY, jsonObject.EulerZ); 
+            var quat1 = new THREE.Quaternion(jsonObject.QX, jsonObject.QY, jsonObject.QZ, jsonObject.QW);
+            //const Euler_current = new THREE.Euler( jsonObject.EulerX*pi/180, jsonObject.EulerY*pi/180, jsonObject.EulerZ*pi/180, 'XYZ' );
+
+            var quat3 = new THREE.Quaternion(0.7068252, 0, 0, 0.7073883) ; // Rota 90 grados sobre x
+            var quat2 = new THREE.Quaternion( 0, 0, -0.3801884, 0.9249091) ; // Rota -45 grados sobre z
+
+            
+            quat1.multiplyQuaternions(quat2, quat1);  // Remplaza el cuaternio 4 con el resultado
+                                                      // del producto especial de quaternios
+            quat1.multiplyQuaternions(quat1, quat3);
+        
+            //quat1.setFromEuler(Euler_current); 
+            
+            cube.quaternion.copy(quat1) ; // Mover cube deacuerdo con quat1
+            
+
+            renderer.render(scene, camera);
+          };
+        
+
+          ws.onclose = function() {
+            // websocket is closed.
+            alert("Connection is closed...");
+          }
+    } 
+
+  WebSocketBegin() ; 
+
+}
+
+main() ; 
+</script>
+
+</html>
